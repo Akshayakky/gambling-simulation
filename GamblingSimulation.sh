@@ -10,8 +10,11 @@ GOAL_PERCENT=50
 MAX_LIMIT=$(($STAKE_PER_DAY+$STAKE_PER_DAY*$GOAL_PERCENT/100))
 MIN_LIMIT=$(($STAKE_PER_DAY-$STAKE_PER_DAY*$GOAL_PERCENT/100))
 
+#VARIABLES
+moneyWonOrLostInDay=50
+
 #FUNCTION TO SIMULATE GAMBLING FOR A DAY
-function moneyWonOrLostForDay(){
+function getMoneyWonOrLostForDay(){
 	local money=$STAKE_PER_DAY
 	checkWin=$((RANDOM%2))
 	while [ $money -gt $MIN_LIMIT -a $money -lt $MAX_LIMIT ]
@@ -27,14 +30,21 @@ function moneyWonOrLostForDay(){
 	echo $moneyAtEndOfDay
 }
 
-for (( i=1; i<=20; i++ ))
+#FOR LOOP TO SIMULATE GAMBLING FOR A MONTH
+for (( i=1; i<=30; i++ ))
 do
-	totalMoney=$(($totalMoney+$(moneyWonOrLostForDay)))
+	moneyWonOrLostForDay=$(getMoneyWonOrLostForDay)
+	if [ $moneyWonOrLostForDay -lt 0 ]
+	then
+		#STORING NO OF DAYS LOST AND NO OF DAYS WON
+		((daysLost++))
+	else
+		((daysWon++))
+	fi
+	totalMoney=$(($totalMoney+$moneyWonOrLostForDay))
+	dayAndMoneyDictionary[$i]=$totalMoney
 done
 
-if [ $totalMoney -lt 0 ]
-then
-	totalMoneyLost=$((-1*$totalMoney))
-else
-	totalMoneyWon=$totalMoney
-fi
+#FINDING MONEY LOST AND WON IN MONTH
+moneyLostInMonth=$(($daysLost*$moneyWonOrLostInDay))
+moneyWonInMonth=$(($daysWon*$moneyWonOrLostInDay))
