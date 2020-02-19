@@ -10,17 +10,31 @@ GOAL_PERCENT=50
 MAX_LIMIT=$(($STAKE_PER_DAY+$STAKE_PER_DAY*$GOAL_PERCENT/100))
 MIN_LIMIT=$(($STAKE_PER_DAY-$STAKE_PER_DAY*$GOAL_PERCENT/100))
 
-#VARIABLES
-money=$STAKE_PER_DAY
-checkWin=$((RANDOM%2))
+#FUNCTION TO SIMULATE GAMBLING FOR A DAY
+function moneyWonOrLostForDay(){
+	local money=$STAKE_PER_DAY
+	checkWin=$((RANDOM%2))
+	while [ $money -gt $MIN_LIMIT -a $money -lt $MAX_LIMIT ]
+	do
+		if [ $checkWin -eq $WIN ]
+		then
+			money=$(($money+$BET_PER_GAME))
+		else
+			money=$(($money-$BET_PER_GAME))
+		fi
+	done
+	moneyAtEndOfDay=$(($money-$STAKE_PER_DAY))
+	echo $moneyAtEndOfDay
+}
 
-#CHECKING FOR WIN OR LOSE AND CALCULATE MONEY
-while [ $money -gt $MIN_LIMIT -a $money -lt $MAX_LIMIT ]
+for (( i=1; i<=20; i++ ))
 do
-	if [ $checkWin -eq $WIN ]
-	then
-		money=$(($money+$BET_PER_GAME))
-	else
-		money=$(($money-$BET_PER_GAME))
-	fi
+	totalMoney=$(($totalMoney+$(moneyWonOrLostForDay)))
 done
+
+if [ $totalMoney -lt 0 ]
+then
+	totalMoneyLost=$((-1*$totalMoney))
+else
+	totalMoneyWon=$totalMoney
+fi
