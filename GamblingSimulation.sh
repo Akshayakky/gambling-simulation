@@ -9,11 +9,7 @@ WIN=1
 GOAL_PERCENT=50
 MAX_LIMIT=$(($STAKE_PER_DAY+$STAKE_PER_DAY*$GOAL_PERCENT/100))
 MIN_LIMIT=$(($STAKE_PER_DAY-$STAKE_PER_DAY*$GOAL_PERCENT/100))
-
-#VARIABLES
-moneyWonOrLostInDay=50
-daysLost=0
-daysWon=0
+MAXIMUM_MONEY_WON_OR_LOST_IN_DAY=50
 
 #FUNCTION TO SIMULATE GAMBLING FOR A DAY
 function getMoneyWonOrLostForDay(){
@@ -34,6 +30,8 @@ function getMoneyWonOrLostForDay(){
 
 #FUNCTION TO SIMULATE GAMBLING FOR A MONTH AND STORE RESULTS IN ARRAY
 function getDayAndMoneyWonArrayForMonth(){
+	daysLost=0
+	daysWon=0
 	#FOR LOOP TO SIMULATE GAMBLING FOR A MONTH
 	for (( i=1; i<=30; i++ ))
 	do
@@ -78,10 +76,17 @@ function getLuckiestDayAndUnluckiestDay(){
 	done
 }
 
-
 getDayAndMoneyWonArrayForMonth
 getLuckiestDayAndUnluckiestDay
-
 #FINDING MONEY LOST AND WON IN MONTH
-moneyLostInMonth=$(($daysLost*$moneyWonOrLostInDay))
-moneyWonInMonth=$(($daysWon*$moneyWonOrLostInDay))
+moneyLostInMonth=$(($daysLost*$MAXIMUM_MONEY_WON_OR_LOST_IN_DAY))
+moneyWonInMonth=$(($daysWon*$MAXIMUM_MONEY_WON_OR_LOST_IN_DAY))
+
+while [ $totalMoney -gt 0 ]
+do
+	getDayAndMoneyWonArrayForMonth
+	getLuckiestDayAndUnluckiestDay
+	#FINDING MONEY LOST AND WON IN MONTH
+	moneyLostInMonth=$(($daysLost*$MAXIMUM_MONEY_WON_OR_LOST_IN_DAY))
+	moneyWonInMonth=$(($daysWon*$MAXIMUM_MONEY_WON_OR_LOST_IN_DAY))
+done
